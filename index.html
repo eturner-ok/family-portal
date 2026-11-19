@@ -75,7 +75,22 @@
   .empty { color: var(--muted); padding: .3em 0; }
   .today-list .empty { font-size: 1.25em; }
 
-  .verse { border-top: 1px solid var(--faint); padding-top: .9em; margin-top: .6em; }
+  .faith { display: flex; align-items: center; gap: 1.4em; border-top: 1px solid var(--faint); padding-top: .9em; margin-top: .6em; }
+  .verse { flex: 1; min-width: 0; }
+
+  /* Advent wreath */
+  .advent { display: none; flex: 0 0 auto; width: 7.6em; text-align: center; --wr-1: #2F5A3A; --wr-2: #3E7049; --wr-3: #244A30; --purple: #5E3A8C; --rose: #C9659A; }
+  .advent.show { display: block; }
+  :root[data-phase="night"] .advent { --wr-1: #4E8A5C; --wr-2: #66A374; --wr-3: #3D7350; --purple: #9572C6; --rose: #E08AB6; }
+  .advent svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .advent .cap { color: var(--muted); font-size: .74em; line-height: 1.25; margin-top: .15em; }
+  .advent .cap b { display: block; color: var(--ink); font-size: 1.15em; font-weight: 650; }
+  .advent .num { font-family: var(--sans); font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+  .advent .unit { font-family: var(--sans); font-weight: 500; fill: var(--muted); }
+  .advent .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.9s ease-in-out infinite alternate; }
+  .advent .glow { animation: glow 1.9s ease-in-out infinite alternate; }
+  @keyframes flicker { 0% { transform: scale(1, 1) skewX(0deg); } 40% { transform: scale(.93, 1.07) skewX(2deg); } 100% { transform: scale(1.04, .95) skewX(-2deg); } }
+  @keyframes glow { from { opacity: .22; } to { opacity: .38; } }
   .verse p { margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.3em; line-height: 1.38; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .verse cite { display: block; font-style: normal; font-weight: 600; color: var(--muted); margin-top: .4em; font-size: .9em; }
 
@@ -107,6 +122,40 @@
   .status.warn { color: var(--alert); font-weight: 600; }
   :root[data-phase="night"] .status.warn { color: #F2A29C; }
 
+
+  /* Seasonal themes: Thanksgiving turkeys and leaves, Christmas skaters and snow */
+  #rink { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+  .skater { position: absolute; left: 0; bottom: .2vw; width: 7.5vw; color: var(--ink); opacity: .85; animation: glide linear forwards; will-change: transform; }
+  .skater.left { animation-name: glide-left; }
+  .skater svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .skater .bob { animation: bob 1.7s ease-in-out infinite; }
+  .skater .leg { transform-box: view-box; transform-origin: 30px 47px; animation: stride 1.7s ease-in-out infinite; }
+  .skater .leg.b { animation-delay: -.85s; }
+  .skater .scarf { transform-box: view-box; transform-origin: 37px 25px; animation: flutter .45s ease-in-out infinite alternate; }
+  @keyframes glide { from { transform: translateX(-12vw); } to { transform: translateX(112vw); } }
+  @keyframes glide-left { from { transform: translateX(112vw) scaleX(-1); } to { transform: translateX(-12vw) scaleX(-1); } }
+  @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.5px); } }
+  @keyframes stride { 0%, 100% { transform: rotate(-24deg); } 50% { transform: rotate(20deg); } }
+  @keyframes flutter { from { transform: rotate(-3deg); } to { transform: rotate(5deg) scaleY(.85); } }
+  .flake { position: absolute; top: -2vw; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 0 2px rgba(20, 34, 48, .25); animation: fall linear infinite; }
+  @keyframes fall { 0% { transform: translate(0, 0); } 50% { transform: translate(1.5vw, 52vh); } 100% { transform: translate(-1vw, 106vh); } }
+  .turkey { opacity: 1; --tk-body: #5A3A24; --tk-wing: #7A5236; --tk-head: #8C6B55; }
+  :root[data-phase="night"] .turkey { --tk-body: #B07A50; --tk-wing: #D2A273; --tk-head: #D9BBA2; }
+  .turkey .tk-body { fill: var(--tk-body); }
+  .turkey .tk-wing { fill: var(--tk-wing); }
+  .turkey .tk-neck { stroke: var(--tk-body); }
+  .turkey .tk-head { fill: var(--tk-head); }
+  .turkey .tleg { transform-box: view-box; transform-origin: 42px 60px; animation: strut .9s ease-in-out infinite; }
+  .turkey .tleg.b { animation-delay: -.45s; }
+  .turkey .head { transform-box: view-box; transform-origin: 51px 47px; animation: peck .9s ease-in-out infinite; }
+  @keyframes strut { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+  @keyframes peck { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(9deg); } }
+  .leaf { position: absolute; top: -3vw; animation: leaf-fall linear infinite; }
+  .leaf svg { display: block; width: 100%; height: auto; animation: spin linear infinite; }
+  @keyframes leaf-fall { 0% { transform: translate(0, 0); } 33% { transform: translate(3vw, 36vh); } 66% { transform: translate(-2.5vw, 72vh); } 100% { transform: translate(1vw, 108vh); } }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { #rink { display: none; } }
+
   @media (orientation: portrait) {
     main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
     .forecast { grid-template-columns: repeat(3, 1fr); }
@@ -114,6 +163,7 @@
 </style>
 </head>
 <body>
+<div id="rink"></div>
 <div class="wrap">
   <div class="top">
     <header>
@@ -130,7 +180,10 @@
     <section>
       <h2>Today</h2>
       <ul class="today-list" id="today"></ul>
-      <div class="verse" id="verse"></div>
+      <div class="faith">
+        <div class="advent" id="advent"></div>
+        <div class="verse" id="verse"></div>
+      </div>
     </section>
     <section>
       <h2>Coming up</h2>
@@ -231,6 +284,7 @@
     $('clock').innerHTML = `${g('hour')}:${g('minute')}<small>${g('dayPeriod')}</small>`;
     $('date').textContent = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' }).format(now);
     setTheme(now);
+    renderAdvent();
     if (shownDay && shownDay !== todayIso()) load(); // new day: refresh right away
     renderStatus();
   }
@@ -290,57 +344,3 @@
       const rest = days.slice(1, 8);
       const box = $('days');
       for (let max = 3; max >= 1; max--) {
-        box.innerHTML = rest.map(d => dayHTML(d, max)).join('');
-        if (box.scrollHeight <= box.clientHeight + 2) break;
-      }
-    } else if (data.calendarError) {
-      $('today').innerHTML = '<li class="empty">Calendars didn’t load. Run testSetup in Apps Script to see why.</li>';
-    }
-
-    const v = data.verse;
-    $('verse').innerHTML = v ? `<p>${esc(v.text)}</p><cite>${esc(v.ref)} (${esc(v.version)})</cite>` : '';
-
-    $('legend').innerHTML = (data.people || []).map(p =>
-      `<button type="button" class="${hidden.includes(p.name) ? 'off' : ''}" data-name="${esc(p.name)}"><i style="--c:${p.color}"></i>${esc(p.name)}</button>`).join('');
-    setTheme(new Date());
-  }
-
-  function renderStatus() {
-    const el = $('status');
-    const problems = (data && data.calendar && data.calendar.problems) || [];
-    const stale = lastOk && Date.now() - lastOk > 30 * 60000;
-    if (!lastOk && lastError) { el.className = 'status warn'; el.textContent = 'Can’t reach the portal service: ' + lastError; return; }
-    if (stale) {
-      el.className = 'status warn';
-      el.textContent = 'Last updated ' + new Date(lastOk).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
-      return;
-    }
-    el.className = problems.length ? 'status warn' : 'status';
-    el.textContent = problems.join('. ');
-  }
-
-  async function load() {
-    try {
-      const res = await fetch(API_URL + '?key=' + encodeURIComponent(KEY) + '&t=' + Date.now());
-      const json = await res.json();
-      if (json.error) throw new Error(json.error);
-      data = json; lastOk = Date.now(); lastError = '';
-      render();
-    } catch (err) {
-      lastError = err.message || String(err);
-    }
-    renderStatus();
-  }
-
-  $('legend').addEventListener('click', e => {
-    const b = e.target.closest('button[data-name]');
-    if (b) toggleHidden(b.dataset.name);
-  });
-
-  tick();
-  load();
-  setInterval(tick, 15000);
-  setInterval(load, REFRESH_MINUTES * 60000);
-</script>
-</body>
-</html>
