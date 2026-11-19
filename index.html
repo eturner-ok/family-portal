@@ -81,6 +81,7 @@
   /* Advent wreath */
   .advent { display: none; flex: 0 0 auto; width: 7.6em; text-align: center; --wr-1: #2F5A3A; --wr-2: #3E7049; --wr-3: #244A30; --purple: #5E3A8C; --rose: #C9659A; }
   .advent.show { display: block; }
+  .faith:has(.advent.show) .verse p { -webkit-line-clamp: 5; font-size: 1.2em; }
   :root[data-phase="night"] .advent { --wr-1: #4E8A5C; --wr-2: #66A374; --wr-3: #3D7350; --purple: #9572C6; --rose: #E08AB6; }
   .advent svg { display: block; width: 100%; height: auto; overflow: visible; }
   .advent .cap { color: var(--muted); font-size: .74em; line-height: 1.25; margin-top: .15em; }
@@ -496,7 +497,7 @@
   const inRange = (md, a, b) => a <= b ? (md >= a && md <= b) : (md >= a || md <= b);
   function currentSeason() {
     if (previewSeason && SEASONS[previewSeason]) return previewSeason;
-    const md = todayIso().slice(5);
+    const md = adventToday().slice(5); // follows &date= when previewing
     return Object.keys(SEASONS).find(k => inRange(md, SEASONS[k].start, SEASONS[k].end)) || '';
   }
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
