@@ -1,0 +1,10 @@
+{
+  "name": "Home",
+  "short_name": "Home",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#C6DAE6",
+  "theme_color": "#C6DAE6"
+}
