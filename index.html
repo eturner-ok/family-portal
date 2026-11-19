@@ -26,6 +26,11 @@
   :root[data-phase="dusk"] { --sky-top: #C9C3D9; --sky-bottom: #EFECF2; }
   :root[data-phase="night"] { --sky-top: #0D1727; --sky-bottom: #1A2638; --ink: #E2E8EF; --muted: #8B9AAD; --faint: rgba(226, 232, 239, .14); }
 
+  /* Fall background for the Thanksgiving season; Christmas keeps the light winter sky */
+  :root[data-season="thanksgiving"] { --sky-top: #EDCDA6; --sky-bottom: #F8EDE0; --muted: #6E5D50; --faint: rgba(70, 40, 20, .14); }
+  :root[data-season="thanksgiving"][data-phase="dusk"] { --sky-top: #E2BBA0; --sky-bottom: #F4E6DB; }
+  :root[data-season="thanksgiving"][data-phase="night"] { --sky-top: #1D1512; --sky-bottom: #2D211B; --ink: #EFE6DC; --muted: #AD9C8E; --faint: rgba(239, 230, 220, .14); }
+
   html, body { height: 100%; margin: 0; }
   html { background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 75%) fixed; background-color: var(--sky-top); }
   body {
@@ -79,10 +84,9 @@
   .verse { flex: 1; min-width: 0; }
 
   /* Advent wreath */
-  .advent { display: none; flex: 0 0 auto; width: 7.6em; text-align: center; --wr-1: #2F5A3A; --wr-2: #3E7049; --wr-3: #244A30; --purple: #5E3A8C; --rose: #C9659A; }
+  .advent { display: none; flex: 0 0 auto; width: 7.6em; text-align: center; }
   .advent.show { display: block; }
   .faith:has(.advent.show) .verse p { -webkit-line-clamp: 5; font-size: 1.2em; }
-  :root[data-phase="night"] .advent { --wr-1: #4E8A5C; --wr-2: #66A374; --wr-3: #3D7350; --purple: #9572C6; --rose: #E08AB6; }
   .advent svg { display: block; width: 100%; height: auto; overflow: visible; }
   .advent .cap { color: var(--muted); font-size: .74em; line-height: 1.25; margin-top: .15em; }
   .advent .cap b { display: block; color: var(--ink); font-size: 1.15em; font-weight: 650; }
@@ -91,7 +95,7 @@
   .advent .flame { transform-box: fill-box; transform-origin: 50% 100%; animation: flicker 1.9s ease-in-out infinite alternate; }
   .advent .glow { animation: glow 1.9s ease-in-out infinite alternate; }
   @keyframes flicker { 0% { transform: scale(1, 1) skewX(0deg); } 40% { transform: scale(.93, 1.07) skewX(2deg); } 100% { transform: scale(1.04, .95) skewX(-2deg); } }
-  @keyframes glow { from { opacity: .22; } to { opacity: .38; } }
+  @keyframes glow { from { opacity: .45; } to { opacity: .8; } }
   .verse p { margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.3em; line-height: 1.38; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .verse cite { display: block; font-style: normal; font-weight: 600; color: var(--muted); margin-top: .4em; font-size: .9em; }
 
@@ -124,7 +128,7 @@
   :root[data-phase="night"] .status.warn { color: #F2A29C; }
 
 
-  /* Seasonal themes: Thanksgiving turkeys and leaves, Christmas skaters and snow */
+  /* Seasonal themes: Thanksgiving turkeys and leaves, Christmas penguins and snow */
   #rink { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
   .skater { position: absolute; left: 0; bottom: .2vw; width: 7.5vw; color: var(--ink); opacity: .85; animation: glide linear forwards; will-change: transform; }
   .skater.left { animation-name: glide-left; }
@@ -140,17 +144,53 @@
   @keyframes flutter { from { transform: rotate(-3deg); } to { transform: rotate(5deg) scaleY(.85); } }
   .flake { position: absolute; top: -2vw; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 0 2px rgba(20, 34, 48, .25); animation: fall linear infinite; }
   @keyframes fall { 0% { transform: translate(0, 0); } 50% { transform: translate(1.5vw, 52vh); } 100% { transform: translate(-1vw, 106vh); } }
-  .turkey { opacity: 1; --tk-body: #5A3A24; --tk-wing: #7A5236; --tk-head: #8C6B55; }
-  :root[data-phase="night"] .turkey { --tk-body: #B07A50; --tk-wing: #D2A273; --tk-head: #D9BBA2; }
-  .turkey .tk-body { fill: var(--tk-body); }
-  .turkey .tk-wing { fill: var(--tk-wing); }
-  .turkey .tk-neck { stroke: var(--tk-body); }
-  .turkey .tk-head { fill: var(--tk-head); }
-  .turkey .tleg { transform-box: view-box; transform-origin: 42px 60px; animation: strut .9s ease-in-out infinite; }
-  .turkey .tleg.b { animation-delay: -.45s; }
-  .turkey .head { transform-box: view-box; transform-origin: 51px 47px; animation: peck .9s ease-in-out infinite; }
-  @keyframes strut { 0%, 100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
-  @keyframes peck { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(9deg); } }
+
+  /* Penguins (Christmas season) */
+  :root { --pg-top: #3B4C63; --pg-bottom: #16202D; }
+  :root[data-phase="night"] { --pg-top: #4A5E7A; --pg-bottom: #1F2B3B; }
+  .penguin { opacity: 1; }
+  .penguin .pg-shadow { fill: rgba(20, 34, 48, .16); }
+  :root[data-phase="night"] .penguin .pg-shadow { fill: rgba(226, 232, 239, .10); }
+  :root[data-phase="night"] .penguin .pg-body, :root[data-phase="night"] .penguin .pg-fl { stroke: rgba(226, 232, 239, .5); stroke-width: 1; }
+  .penguin .pg-blade { stroke: #B8C4CF; stroke-width: 2.4; fill: none; stroke-linecap: round; }
+  .penguin .pg-post { stroke: #8C99A6; stroke-width: 1.6; }
+  .penguin .pg-lean { transform-box: view-box; transform-origin: 50px 104px; animation: pg-sway 1.7s ease-in-out infinite; }
+  .penguin .pg-leg { transform-box: view-box; transform-origin: 50px 92px; animation: pg-push 1.7s ease-in-out infinite; }
+  .penguin .pg-leg.b { animation-delay: -.85s; }
+  .penguin.chick .pg-lean, .penguin.chick .pg-leg { animation-duration: 1.1s; }
+  .penguin.chick .pg-leg.b { animation-delay: -.55s; }
+  .penguin .pg-flipper { transform-box: view-box; transform-origin: 44px 54px; animation: pg-flap .9s ease-in-out infinite alternate; }
+  .penguin .pg-scarf { transform-box: view-box; transform-origin: 44px 48px; animation: pg-flutter .4s ease-in-out infinite alternate; }
+  .penguin svg { transform-origin: 50% 95%; }
+  @keyframes pg-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(3deg); } }
+  @keyframes pg-push { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(-7px, -2px) rotate(-7deg); } }
+  @keyframes pg-flap { from { transform: rotate(-6deg); } to { transform: rotate(9deg); } }
+  @keyframes pg-flutter { from { transform: rotate(-4deg) scaleY(1); } to { transform: rotate(5deg) scaleY(.82); } }
+  @keyframes pg-wobble { 0%, 44% { transform: rotate(0); } 47% { transform: rotate(-11deg); } 50% { transform: rotate(9deg); } 53% { transform: rotate(-6deg); } 56% { transform: rotate(3deg); } 59%, 100% { transform: rotate(0); } }
+  :root { --tk-top: #8A5631; --tk-bottom: #3F2516; --tk-wing1: #9A653C; --tk-wing2: #5E3920; --tk-f1: #4A2C18; --tk-f2: #7A4B2A; --tk-skin: #C7D2DD;
+          --wr-1a: #4F8A57; --wr-1b: #2C5A35; --wr-2a: #3F7A4C; --wr-2b: #22492C; --wr-3a: #5E9A62; --wr-3b: #36663E; --wr-3: #1E3E26;
+          --wr-p1: #9C7BD0; --wr-p2: #6A45A0; --wr-p3: #4B2E78; }
+  :root[data-phase="night"] { --tk-top: #B98455; --tk-bottom: #6E4628; --tk-wing1: #C99567; --tk-wing2: #8A5A35; --tk-f1: #6A4428; --tk-f2: #9A6A42; --tk-skin: #D9E2EA;
+          --wr-1a: #6FAE77; --wr-1b: #437A4D; --wr-2a: #5E9C6A; --wr-2b: #386B45; --wr-3a: #7DBA80; --wr-3b: #4F8758; --wr-3: #2C5636;
+          --wr-p1: #B9A0E2; --wr-p2: #8E68C6; --wr-p3: #6A4AA0; }
+  .turkey { opacity: 1; }
+  .turkey .tk-shadow { fill: rgba(40, 20, 10, .16); }
+  :root[data-phase="night"] .turkey .tk-shadow { fill: rgba(255, 240, 225, .08); }
+  :root[data-phase="night"] .turkey .tk-body { stroke: rgba(255, 240, 225, .45); stroke-width: 1; }
+  .turkey .tk-shin { stroke: #D9A441; stroke-width: 3; stroke-linecap: round; }
+  .turkey .tk-toe { stroke: #D9A441; stroke-width: 2; stroke-linecap: round; }
+  .turkey .tk-leg { transform-box: view-box; animation: tk-step .9s ease-in-out infinite; }
+  .turkey .tk-leg.a { transform-origin: 50px 84px; }
+  .turkey .tk-leg.b { transform-origin: 60px 84px; animation-delay: -.45s; }
+  .turkey .tk-bob { animation: tk-bob .45s ease-in-out infinite; }
+  .turkey .tk-head { transform-box: view-box; transform-origin: 70px 66px; animation: tk-thrust .9s ease-in-out infinite; }
+  .turkey .tk-tail { transform-box: view-box; transform-origin: 44px 66px; animation: tk-tail 1.8s ease-in-out infinite; }
+  .turkey svg { transform-origin: 40% 90%; }
+  @keyframes tk-step { 0%, 100% { transform: rotate(-17deg); } 50% { transform: rotate(17deg); } }
+  @keyframes tk-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(1.6px); } }
+  @keyframes tk-thrust { 0%, 100% { transform: translateX(0) rotate(0); } 30% { transform: translateX(3.5px) rotate(4deg); } 60% { transform: translateX(-1px) rotate(-2deg); } }
+  @keyframes tk-tail { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  @keyframes tk-display { 0%, 42% { transform: scale(1); } 46%, 54% { transform: scale(1.14) translateY(-2px); } 58%, 100% { transform: scale(1); } }
   .leaf { position: absolute; top: -3vw; animation: leaf-fall linear infinite; }
   .leaf svg { display: block; width: 100%; height: auto; animation: spin linear infinite; }
   @keyframes leaf-fall { 0% { transform: translate(0, 0); } 33% { transform: translate(3vw, 36vh); } 66% { transform: translate(-2.5vw, 72vh); } 100% { transform: translate(1vw, 108vh); } }
@@ -164,6 +204,28 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="pgBody" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" style="stop-color:var(--pg-top)"/><stop offset="1" style="stop-color:var(--pg-bottom)"/></linearGradient>
+  <radialGradient id="pgBelly" cx=".45" cy=".35" r=".75"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCE4EC"/></radialGradient>
+  <linearGradient id="pgBeak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC15A"/><stop offset="1" stop-color="#E8892A"/></linearGradient>
+  <linearGradient id="pgFoot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB24D"/><stop offset="1" stop-color="#E07C22"/></linearGradient>
+  <radialGradient id="pgChick" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#C9D1D9"/><stop offset="1" stop-color="#8F9BA8"/></radialGradient>
+
+  <linearGradient id="tkFeather" x1="0" y1="1" x2="0" y2="0"><stop offset="0" style="stop-color:var(--tk-f1)"/><stop offset="1" style="stop-color:var(--tk-f2)"/></linearGradient>
+  <linearGradient id="tkBody" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" style="stop-color:var(--tk-top)"/><stop offset="1" style="stop-color:var(--tk-bottom)"/></linearGradient>
+  <linearGradient id="tkWing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--tk-wing1)"/><stop offset="1" style="stop-color:var(--tk-wing2)"/></linearGradient>
+  <linearGradient id="tkBeak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC970"/><stop offset="1" stop-color="#D98A2A"/></linearGradient>
+  <linearGradient id="wrLeaf1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wr-1a)"/><stop offset="1" style="stop-color:var(--wr-1b)"/></linearGradient>
+  <linearGradient id="wrLeaf2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wr-2a)"/><stop offset="1" style="stop-color:var(--wr-2b)"/></linearGradient>
+  <linearGradient id="wrLeaf3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--wr-3a)"/><stop offset="1" style="stop-color:var(--wr-3b)"/></linearGradient>
+  <radialGradient id="wrCone" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#9A6A42"/><stop offset="1" stop-color="#5A3A22"/></radialGradient>
+  <linearGradient id="wrRibbon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0483C"/><stop offset="1" stop-color="#A82A22"/></linearGradient>
+  <linearGradient id="wrPurple" x1="0" y1="0" x2="1" y2="0"><stop offset="0" style="stop-color:var(--wr-p1)"/><stop offset=".55" style="stop-color:var(--wr-p2)"/><stop offset="1" style="stop-color:var(--wr-p3)"/></linearGradient>
+  <linearGradient id="wrRose" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F2A9CB"/><stop offset=".55" stop-color="#D86FA3"/><stop offset="1" stop-color="#B0507F"/></linearGradient>
+  <linearGradient id="wrWhite" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F3EEE4"/><stop offset="1" stop-color="#D9D1C2"/></linearGradient>
+  <linearGradient id="wrFlame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A2E"/><stop offset=".55" stop-color="#FFC94A"/><stop offset="1" stop-color="#FFE9A0"/></linearGradient>
+  <radialGradient id="wrGlow"><stop offset="0" stop-color="#FFD36B" stop-opacity=".9"/><stop offset="1" stop-color="#FFD36B" stop-opacity="0"/></radialGradient>
+</defs></svg>
 <div id="rink"></div>
 <div class="wrap">
   <div class="top">
@@ -302,6 +364,7 @@
       if (h < 6 || h >= 20) phase = 'night';
     }
     document.documentElement.dataset.phase = phase;
+    document.documentElement.dataset.season = currentSeason();
   }
 
   function render() {
@@ -424,45 +487,70 @@
   }
 
   function wreathSVG(info) {
-    const cx = 60, cy = 62, R = 38;
-    let leaves = '';
-    for (let i = 0; i < 36; i++) {
-      const a = i * 10 + (i % 3) * 3;
-      const r = R + ((i % 4) - 1.5) * 2.2;
-      const x = cx + r * Math.cos(a * Math.PI / 180), y = cy + r * Math.sin(a * Math.PI / 180);
-      const tilt = a + 90 + ((i % 5) - 2) * 14;
-      leaves += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9.5" ry="4" fill="var(--wr-${(i % 3) + 1})" transform="rotate(${tilt} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
-    }
-    let berries = '';
-    for (let i = 0; i < 9; i++) {
-      const a = i * 40 + 20, r = i % 2 ? R + 6 : R - 6;
-      berries += `<circle cx="${(cx + r * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(cy + r * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="2.3" fill="#C8382E"/>`;
-    }
-    const flame = (x, top, delay) => `
-      <circle class="glow" cx="${x}" cy="${top - 5}" r="8" fill="#F6B73C" style="animation-delay:${delay}s"/>
-      <path class="flame" style="animation-delay:${delay}s" d="M${x} ${top - 12} C${x + 4} ${top - 6} ${x + 4} ${top - 1} ${x} ${top} C${x - 4} ${top - 1} ${x - 4} ${top - 6} ${x} ${top - 12} Z" fill="#F6B73C"/>
-      <path d="M${x} ${top - 7} C${x + 2} ${top - 4} ${x + 2} ${top - 1.5} ${x} ${top - 1} C${x - 2} ${top - 1.5} ${x - 2} ${top - 4} ${x} ${top - 7} Z" fill="#FFF1C2"/>`;
-    const spots = [225, 315, 45, 135];
-    let candles = '';
-    spots.forEach((deg, i) => {
-      const x = +(cx + R * Math.cos(deg * Math.PI / 180)).toFixed(1);
-      const base = +(cy + R * Math.sin(deg * Math.PI / 180)).toFixed(1) + 3;
-      const top = base - 24;
-      const lit = info.daysLeft <= 0 || i < info.week;
-      candles += `<rect x="${x - 4.5}" y="${top}" width="9" height="24" rx="1.6" fill="var(--${CANDLES[i]})"/>
-        <path d="M${x} ${top} L${x} ${top - 2.5}" stroke="var(--ink)" stroke-width="1" opacity=".6"/>
-        ${lit ? flame(x, top - 1.5, -i * .45) : ''}`;
-    });
-    let middle;
-    if (info.daysLeft > 0) {
-      middle = `<text class="num" x="${cx}" y="${cy + 6}" text-anchor="middle" font-size="${info.daysLeft > 9 ? 23 : 26}">${info.daysLeft}</text>
-        <text class="unit" x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="7.5">${info.daysLeft === 1 ? 'day' : 'days'}</text>`;
-    } else {
-      middle = `<rect x="${cx - 5}" y="${cy - 8}" width="10" height="26" rx="1.8" fill="#F4EFE6" stroke="rgba(0,0,0,.15)" stroke-width=".6"/>
-        <path d="M${cx} ${cy - 8} L${cx} ${cy - 10.5}" stroke="var(--ink)" stroke-width="1" opacity=".6"/>${flame(cx, cy - 10, -.9)}`;
-    }
-    return `<svg viewBox="0 0 120 120" aria-hidden="true">${leaves}${berries}${candles}${middle}</svg>`;
+  const cx = 60, cy = 62, R = 38;
+  const rad = d => d * Math.PI / 180;
+  const P = (r, d) => [cx + r * Math.cos(rad(d)), cy + r * Math.sin(rad(d))];
+  let greens = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--wr-3)" stroke-width="13"/>`;
+  for (let i = 0; i < 30; i++) {
+    const d = i * 12 + (i % 2) * 5;
+    const r = R + ((i % 3) - 1) * 4;
+    const [x, y] = P(r, d);
+    const t = d + 90 + ((i % 4) - 1.5) * 18;
+    greens += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${t.toFixed(0)})">
+      <path d="M-11 0 C-6 -3.6 2 -3.4 9 0 C2 3.4 -6 3.6 -11 0 Z" fill="url(#wrLeaf${(i % 3) + 1})"/>
+      <path d="M-8 -1 C-4 -6 3 -7 7 -5 C3 -3 -3 -1.5 -8 -1 Z" fill="url(#wrLeaf${((i + 1) % 3) + 1})"/>
+      <path d="M-8 1 C-4 6 3 7 7 5 C3 3 -3 1.5 -8 1 Z" fill="url(#wrLeaf${((i + 2) % 3) + 1})"/>
+      <path d="M-10 0 L8 0" stroke="rgba(255,255,255,.18)" stroke-width=".6"/></g>`;
   }
+  const cone = (d) => {
+    const [x, y] = P(R, d);
+    let scales = '';
+    for (let k = 0; k < 4; k++) scales += `<path d="M-3.6 ${-4 + k * 2.6} Q0 ${-1.6 + k * 2.6} 3.6 ${-4 + k * 2.6}" stroke="rgba(255,220,180,.35)" stroke-width=".8" fill="none"/>`;
+    return `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${d + 90})"><ellipse rx="4.6" ry="6.8" fill="url(#wrCone)"/>${scales}</g>`;
+  };
+  const berries = (d) => {
+    const [x, y] = P(R + 1, d);
+    return [[0, 0], [3.4, 1.6], [0.8, 3.6]].map(([dx, dy]) =>
+      `<circle cx="${(x + dx - 1.4).toFixed(1)}" cy="${(y + dy - 1.8).toFixed(1)}" r="2.3" fill="#C8382E"/><circle cx="${(x + dx - 2).toFixed(1)}" cy="${(y + dy - 2.5).toFixed(1)}" r=".75" fill="rgba(255,255,255,.75)"/>`).join('');
+  };
+  const [bx, by] = P(R + 2, 90);
+  const bow = `<g transform="translate(${bx} ${by + 2})">
+      <path d="M-2 0 L-7 13 L-4 12 L-2.5 15 Z M2 0 L7 13 L4 12 L2.5 15 Z" fill="#A82A22"/>
+      <path d="M0 0 C-5 -7 -14 -6 -13 -1 C-12 4 -4 3 0 0 Z M0 0 C5 -7 14 -6 13 -1 C12 4 4 3 0 0 Z" fill="url(#wrRibbon)"/>
+      <path d="M-11 -2 C-8 -4 -4 -3 -2 -1 M11 -2 C8 -4 4 -3 2 -1" stroke="rgba(255,255,255,.35)" stroke-width=".8" fill="none"/>
+      <ellipse rx="2.6" ry="3" fill="#B8302A"/></g>`;
+  const flame = (x, top, delay) => `
+      <circle class="glow" cx="${x}" cy="${top - 6}" r="10" fill="url(#wrGlow)" style="animation-delay:${delay}s"/>
+      <g class="flame" style="animation-delay:${delay}s">
+        <path d="M${x} ${top - 14} C${x + 4.6} ${top - 7} ${x + 4.4} ${top - 1} ${x} ${top} C${x - 4.4} ${top - 1} ${x - 4.6} ${top - 7} ${x} ${top - 14} Z" fill="url(#wrFlame)"/>
+        <path d="M${x} ${top - 8} C${x + 2} ${top - 4.6} ${x + 2} ${top - 1.6} ${x} ${top - 1} C${x - 2} ${top - 1.6} ${x - 2} ${top - 4.6} ${x} ${top - 8} Z" fill="#FFF6D8"/>
+        <ellipse cx="${x}" cy="${top - .8}" rx="1.4" ry="1" fill="#7FA8E0" opacity=".7"/>
+      </g>`;
+  const candle = (x, base, h, grad, lit, delay) => {
+    const top = base - h;
+    return `<rect x="${x - 4.6}" y="${top}" width="9.2" height="${h}" rx="1.4" fill="url(#${grad})"/>
+      <path d="M${x - 4.6} ${top + 1.2} C${x - 3} ${top + 2} ${x - 2.6} ${top + 5} ${x - 1.6} ${top + 5.4} C${x - .6} ${top + 5.8} ${x - .4} ${top + 2} ${x + 1} ${top + 2} C${x + 2} ${top + 2} ${x + 2.2} ${top + 3.6} ${x + 3} ${top + 3.6} C${x + 3.8} ${top + 3.6} ${x + 4} ${top + 1.6} ${x + 4.6} ${top + 1.2} L${x + 4.6} ${top + 1} L${x - 4.6} ${top + 1} Z" fill="rgba(255,255,255,.28)"/>
+      <ellipse cx="${x}" cy="${top + .6}" rx="4.6" ry="1.2" fill="rgba(255,255,255,.35)"/>
+      <path d="M${x} ${top} L${x + .4} ${top - 3}" stroke="#2A2420" stroke-width="1.1" stroke-linecap="round"/>
+      ${lit ? flame(x + .4, top - 2, delay) : ''}`;
+  };
+  const spots = [225, 315, 45, 135];
+  const grads = ['wrPurple', 'wrPurple', 'wrRose', 'wrPurple'];
+  let candles = '';
+  spots.forEach((deg, i) => {
+    const [x, y] = P(R, deg);
+    const lit = info.daysLeft <= 0 || i < info.week;
+    candles += candle(+x.toFixed(1), +y.toFixed(1) + 4, 25, grads[i], lit, -i * .45);
+  });
+  let middle;
+  if (info.daysLeft > 0) {
+    middle = `<text class="num" x="${cx}" y="${cy + 6}" text-anchor="middle" font-size="${info.daysLeft > 9 ? 23 : 26}">${info.daysLeft}</text>
+      <text class="unit" x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="7.5">${info.daysLeft === 1 ? 'day' : 'days'}</text>`;
+  } else {
+    middle = candle(cx, cy + 18, 28, 'wrWhite', true, -.9);
+  }
+  return `<svg viewBox="0 0 120 120" aria-hidden="true">${greens}${cone(0)}${cone(180)}${berries(270)}${berries(20)}${berries(160)}${bow}${candles}${middle}</svg>`;
+}
 
   function renderAdvent() {
     const iso = adventToday();
@@ -484,7 +572,7 @@
   // Dates are month-day, inclusive. To preview, add &season=thanksgiving or &season=christmas to the link.
   const SEASONS = {
     thanksgiving: { start: '11-01', end: '11-30', falling: true },  // falling leaves + strutting turkeys
-    christmas:    { start: '12-01', end: '01-01', falling: true }   // snow + skaters
+    christmas:    { start: '12-01', end: '01-01', falling: true }   // snow + skating penguins
   };
   const SCARVES = ['#C8382E', '#2E7D4F', '#D4A12A', '#2F6FB0', '#B8487A'];
   const LEAVES = ['#B8452A', '#D98B2B', '#9C3423', '#C9A03A', '#A8612E'];
@@ -502,45 +590,96 @@
   }
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-  function skaterSVG(scarf, hat) {
-    return `<svg viewBox="0 0 60 84" aria-hidden="true"><g class="bob"><g transform="rotate(9 30 72)">
-      <path class="scarf" fill="${scarf}" d="M38 23 C30 22 20 19 8 23 L9 28 C20 25 29 26 37 28 Z"/>
-      <g fill="currentColor">
-        <circle cx="36" cy="17" r="7"/>
-        <path d="M30 24 L42 24 L36 48 L24 48 Z"/>
-      </g>
-      <path fill="${hat}" d="M28.6 15.5 Q36 2 43.4 15.5 Z"/><circle fill="${hat}" cx="36" cy="5.5" r="2.8"/>
-      <path fill="${scarf}" d="M31 23 L42 23 L41 27 L32 27 Z"/>
-      <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none">
-        <path d="M33 29 L21 37"/><path d="M40 29 L51 34"/>
-      </g>
-      <g class="leg a" stroke="currentColor" stroke-linecap="round" fill="none">
-        <path stroke-width="5.5" d="M30 47 L26 70"/><path stroke-width="2" d="M20 73.5 L33 73.5"/>
-      </g>
-      <g class="leg b" stroke="currentColor" stroke-linecap="round" fill="none">
-        <path stroke-width="5.5" d="M31 47 L35 70"/><path stroke-width="2" d="M29 73.5 L42 73.5"/>
-      </g>
-    </g></g></svg>`;
-  }
+  function penguinSVG(scarf, hat) {
+  return `<svg viewBox="0 0 100 112" aria-hidden="true">
+  <ellipse class="pg-shadow" cx="51" cy="108" rx="27" ry="3"/>
+  <g class="pg-lean">
+    <g class="pg-leg a"><path class="pg-post" d="M40 99 V104.5 M51 99 V104.5"/><path class="pg-blade" d="M33 105 H56 Q62 105 62.5 100.5"/><ellipse cx="46" cy="96.5" rx="9.5" ry="3.8" fill="url(#pgFoot)"/></g>
+    <g class="pg-leg b"><path class="pg-post" d="M48 99 V104.5 M59 99 V104.5"/><path class="pg-blade" d="M41 105 H64 Q70 105 70.5 100.5"/><ellipse cx="54" cy="96.5" rx="9.5" ry="3.8" fill="url(#pgFoot)"/></g>
+    <path d="M24 86 C30 92 40 94 50 94 L18 92 Z" fill="url(#pgBody)"/>
+    <path class="pg-body" fill="url(#pgBody)" d="M57 16 C72 16 80 30 79 46 C78 64 76 80 66 90 C58 97 40 97 31 91 C20 84 22 66 28 52 C33 40 40 18 57 16 Z"/>
+    <path fill="url(#pgBelly)" d="M64 44 C73 52 74 70 69 82 C64 92 48 94 41 88 C35 82 38 66 44 56 C49 48 56 42 64 44 Z"/>
+    <path fill="#F8FBFD" d="M61 24 C68 22 75 27 75 35 C75 41 70 44 64 43 C58 42 55 36 56 31 C57 27 58 25 61 24 Z"/>
+    <circle cx="66.5" cy="31.5" r="3.4" fill="#132030"/>
+    <circle cx="67.8" cy="30.2" r="1.2" fill="#fff"/>
+    <circle cx="68" cy="38.5" r="2.8" fill="#F29C9C" opacity=".55"/>
+    <path fill="url(#pgBeak)" d="M73.5 32.5 C79 32.5 84 34 85.5 35.6 C82 37.6 77 38.4 73.2 37.6 C72.4 36 72.6 34 73.5 32.5 Z"/>
+    <path d="M74 35.4 C78 35.8 82 35.7 85 35.5" stroke="#B9661B" stroke-width=".7" fill="none" opacity=".7"/>
+    <g class="pg-flipper"><path fill="url(#pgBody)" class="pg-fl" d="M42 52 C36 56 28 64 22 76 C21 79 24 80 26 78 C33 70 40 64 46 60 Z"/><path d="M41 54 C35 59 29 66 24.5 75" stroke="rgba(255,255,255,.22)" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+    <g class="pg-scarf">
+      <path fill="${scarf}" d="M44 44 C40 46 31 47 20 46 C14 46 10 48 9 51 C14 52 22 52 30 51 C36 50 41 50 44 50 Z"/>
+      <path d="M11 49.5 L7 52.5 M14 50.5 L11 54 M17 50.8 L15 54.6" stroke="${scarf}" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M22 46.4 L24 51.4 M29 46.6 L30.6 51.2" stroke="#fff" stroke-width="1.6" opacity=".55"/>
+    </g>
+    <path fill="${scarf}" d="M41 42 C50 46 64 47 74 42 L75 48 C64 53 50 53 40 49 Z"/>
+    <path d="M47 44.6 L46.2 50.4 M55 45.6 L54.6 51.6 M63 45.4 L63.4 51.4" stroke="#fff" stroke-width="1.7" opacity=".55"/>
+    <path fill="${hat}" d="M45 24 C46 12 55 6 63 8 C70 10 74 16 74 23 Z"/>
+    <path fill="${hat}" d="M43.5 21.5 C53 18 65 18 75.5 21.5 L75 27 C65 24 53 24 44 27 Z"/>
+    <path d="M47 20.6 V26 M51 19.8 V25.2 M55 19.4 V24.8 M59 19.3 V24.7 M63 19.5 V24.9 M67 19.9 V25.3 M71 20.6 V26" stroke="rgba(0,0,0,.18)" stroke-width="1"/>
+    <path d="M50 14 C55 9 62 9 66 11" stroke="rgba(255,255,255,.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="6.5" r="5.2" fill="#F6F2EA"/>
+    <circle cx="58.4" cy="5" r="1.8" fill="#fff"/>
+  </g></svg>`;
+}
+function chickSVG(scarf) {
+  return `<svg viewBox="0 0 100 112" aria-hidden="true">
+  <ellipse class="pg-shadow" cx="51" cy="108" rx="22" ry="2.8"/>
+  <g class="pg-lean">
+    <g class="pg-leg a"><path class="pg-post" d="M42 99.5 V104.5 M50 99.5 V104.5"/><path class="pg-blade" d="M36 105 H54 Q59 105 59.5 101"/><ellipse cx="46" cy="97" rx="8" ry="3.4" fill="url(#pgFoot)"/></g>
+    <g class="pg-leg b"><path class="pg-post" d="M50 99.5 V104.5 M58 99.5 V104.5"/><path class="pg-blade" d="M44 105 H62 Q67 105 67.5 101"/><ellipse cx="54" cy="97" rx="8" ry="3.4" fill="url(#pgFoot)"/></g>
+    <path class="pg-fluff" fill="url(#pgChick)" d="M50 30 C68 30 78 46 77 64 C76 82 66 95 50 95 C34 95 24 82 24 64 C24 46 32 30 50 30 Z"/>
+    <path fill="#2A3646" d="M52 31 C51 27 53 24 56 23 C55 26 56 28 58 30 Z"/>
+    <path fill="#EEF2F5" d="M58 56 C68 60 70 76 64 86 C58 92 46 92 42 86 C38 78 44 62 58 56 Z"/>
+    <path fill="#1E2A38" d="M47 32 C58 28 70 34 74 46 C66 42 58 42 50 46 C44 49 38 48 36 44 C38 38 42 34 47 32 Z"/>
+    <path fill="#F8FBFD" d="M54 44 C62 41 71 44 74 51 C74 58 68 61 61 60 C55 59 51 54 51 49 C51 46 52 45 54 44 Z"/>
+    <circle cx="64.5" cy="50" r="3.3" fill="#132030"/>
+    <circle cx="65.8" cy="48.7" r="1.2" fill="#fff"/>
+    <circle cx="67" cy="56" r="2.8" fill="#F29C9C" opacity=".6"/>
+    <path fill="url(#pgBeak)" d="M72.5 50 C76.5 50.3 79.5 51.4 80.5 52.6 C78 54 75 54.5 72.3 54 Z"/>
+    <g class="pg-flipper"><path fill="#9AA6B2" d="M38 62 C33 66 29 72 27 78 C27 80 29 81 31 79 C34 74 38 70 42 67 Z"/></g>
+    <g class="pg-scarf"><path fill="${scarf}" d="M42 63 C36 65 28 65 20 64 C17 64 15 66 15 68 C21 69 29 69 36 68 C39 67.6 42 67.6 43 67.6 Z"/></g>
+    <path fill="${scarf}" d="M40 60 C49 64 61 65 71 60 L72 65.5 C61 70.5 49 70.5 40 66.5 Z"/>
+  </g></svg>`;
+}
 
   function turkeySVG() {
-    const fan = [-62, -31, 0, 31, 62].map((a, i) =>
-      `<ellipse cx="30" cy="27" rx="7.5" ry="21" fill="${FEATHERS[i]}" transform="rotate(${a} 30 50)"/>`).join('');
-    return `<svg viewBox="0 0 80 80" aria-hidden="true"><g class="bob">
-      ${fan}
-      <g class="tleg a" stroke="#D4A12A" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M40 60 L38 76 M38 76 L44 77"/></g>
-      <g class="tleg b" stroke="#D4A12A" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M44 60 L45 76 M45 76 L51 77"/></g>
-      <ellipse class="tk-body" cx="41" cy="50" rx="18" ry="14"/>
-      <path class="tk-wing" d="M30 47 C36 41 47 43 50 52 C43 55 35 54 30 47 Z"/>
-      <g class="head">
-        <path class="tk-neck" d="M51 46 C54 40 55 35 56 30" stroke-width="6.5" stroke-linecap="round" fill="none"/>
-        <circle class="tk-head" cx="57" cy="27" r="5.2"/>
-        <path d="M62 26 L68 28 L62 30 Z" fill="#D4A12A"/>
-        <path d="M60.5 29.5 C63 31 63 35 60.5 37 C59 35 59 32 60.5 29.5 Z" fill="#C8382E"/>
-        <circle cx="58.5" cy="25.6" r="1.1" fill="#142230"/>
-      </g>
-    </g></svg>`;
-  }
+  const back = [-72, -54, -36, -18, 0, 18, 36, 54, 72].map((a, i) => `
+      <g transform="rotate(${a} 44 66)">
+        <path d="M44 66 C38 52 36 30 38 16 C40 8 48 8 50 16 C52 30 50 52 44 66 Z" fill="url(#tkFeather)"/>
+        <path d="M38.4 19 C39.5 13 42 11 44 11 C46 11 48.5 13 49.6 19 C47 17.6 41 17.6 38.4 19 Z" fill="${i % 2 ? '#C9772A' : '#A6502A'}"/>
+        <path d="M39 15.5 C40.5 10.5 47.5 10.5 49 15.5 C46.5 13.6 41.5 13.6 39 15.5 Z" fill="#F1DCAE"/>
+        <path d="M44 62 L44 18" stroke="rgba(255,235,200,.22)" stroke-width=".8"/>
+      </g>`).join('');
+  const front = [-60, -40, -20, 0, 20, 40, 60].map((a, i) => `
+      <g transform="rotate(${a} 44 66)">
+        <path d="M44 66 C39.5 56 38.5 42 40 32 C41.5 26 46.5 26 48 32 C49.5 42 48.5 56 44 66 Z" fill="${i % 2 ? '#8E3A22' : '#7A4426'}"/>
+        <path d="M40.2 34 C41.5 29.5 46.5 29.5 47.8 34 C45.5 32.6 42.5 32.6 40.2 34 Z" fill="#D9A04A"/>
+      </g>`).join('');
+  const scallops = [[44,62],[50,60],[56,60],[47,68],[53,67],[59,66],[50,74],[56,73]].map(([x,y]) =>
+    `<path d="M${x-3.4} ${y} C${x-2} ${y+2.6} ${x+2} ${y+2.6} ${x+3.4} ${y}" stroke="rgba(255,225,190,.28)" stroke-width="1" fill="none"/>`).join('');
+  return `<svg viewBox="0 0 120 112" aria-hidden="true">
+  <ellipse class="tk-shadow" cx="56" cy="106" rx="30" ry="3.2"/>
+  <g class="tk-bob">
+    <g class="tk-tail">${back}${front}</g>
+    <g class="tk-leg a"><path d="M50 84 L48 102" class="tk-shin"/><path d="M48 102 L41 104 M48 102 L54.5 104.5 M48 102 L45 105" class="tk-toe"/></g>
+    <g class="tk-leg b"><path d="M60 84 L61 102" class="tk-shin"/><path d="M61 102 L54.5 104 M61 102 L68 104.5 M61 102 L58.5 105" class="tk-toe"/></g>
+    <path class="tk-body" fill="url(#tkBody)" d="M30 66 C30 52 44 46 58 48 C72 50 80 60 78 72 C76 84 64 90 52 89 C38 88 30 78 30 66 Z"/>
+    ${scallops}
+    <path fill="url(#tkWing)" d="M38 62 C44 54 58 54 66 62 C68 68 64 76 56 79 C47 81 39 75 38 62 Z"/>
+    <path d="M44 64 C47 66.5 51 66.5 54 64 M47 70 C50 72.5 54 72.5 57 70 M42 69 C44 71 46 72 48 72 M52 76 C55 77 58 76 60 74" stroke="rgba(30,15,5,.35)" stroke-width="1" fill="none"/>
+    <path d="M40 60 C46 55 56 55 63 60" stroke="rgba(255,225,190,.3)" stroke-width="1.2" fill="none"/>
+    <g class="tk-head">
+      <path fill="url(#tkBody)" class="tk-body" d="M66 62 C70 56 72 50 74 44 L80 44 C80 52 78 60 72 66 Z"/>
+      <path fill="var(--tk-skin)" d="M73 46 C73 38 75 30 80 27 C86 24 92 28 91 35 C90 41 85 45 80 46 C77 47 75 47 73 46 Z"/>
+      <circle cx="84.5" cy="32" r="2.7" fill="#132030"/>
+      <circle cx="85.4" cy="31" r=".95" fill="#fff"/>
+      <path fill="url(#tkBeak)" d="M89.5 33 C93 33 96.5 34.2 97.5 35.6 C94.5 37 91.5 37.4 89 36.6 Z"/>
+      <path fill="#C8382E" d="M89 31.5 C91.5 30 93.5 31.5 93 34 C92.6 36.5 92.4 40 91 42 C90 40 89.6 36 89 31.5 Z"/>
+      <path fill="#C8382E" d="M86 39 C89.5 39 90 43 89 47 C88 50 85 50 84 47 C83 44 83.5 40 86 39 Z"/>
+      <path d="M85 41 C86.5 42 87.5 44 87.4 46" stroke="rgba(255,255,255,.3)" stroke-width=".9" fill="none"/>
+    </g>
+  </g></svg>`;
+}
 
   function launch(html, cls, width, duration, delay, goingLeft) {
     const el = document.createElement('div');
@@ -557,18 +696,32 @@
     const season = currentSeason();
     const goingLeft = Math.random() < .5;
     if (season === 'christmas') {
-      const count = Math.random() < .45 ? 1 : (Math.random() < .7 ? 2 : 3);
-      const duration = 15 + Math.random() * 7;
+      const groups = [['adult'], ['adult', 'chick'], ['adult', 'adult'], ['adult', 'chick', 'adult'], ['adult', 'chick', 'chick']];
+      const group = pick(groups);
+      const duration = 17 + Math.random() * 7;
       let delay = 0;
-      for (let i = 0; i < count; i++) {
-        launch(skaterSVG(pick(SCARVES), pick(SCARVES)), 'ice', 6.2 + Math.random() * 2.2, duration, delay, goingLeft);
-        delay += 1 + Math.random() * 1.6;
+      group.forEach(kind => {
+        const html = kind === 'chick' ? chickSVG(pick(SCARVES)) : penguinSVG(pick(SCARVES), pick(SCARVES));
+        launch(html, 'penguin ' + kind, kind === 'chick' ? 4.6 : 6.8, duration, delay, goingLeft);
+        delay += 1.1 + Math.random() * 1.4;
+      });
+      // Now and then one of them wobbles mid-glide
+      if (Math.random() < .35) {
+        const all = $('rink').querySelectorAll('.penguin:not(.wobbled)');
+        const el = all[all.length - 1 - Math.floor(Math.random() * Math.min(group.length, all.length))];
+        if (el) { el.classList.add('wobbled'); el.querySelector('svg').style.animation = `pg-wobble ${duration}s linear ${el.style.animationDelay}`; }
       }
     } else if (season === 'thanksgiving') {
       const count = Math.random() < .7 ? 1 : 2;
       const duration = 24 + Math.random() * 8;
       for (let i = 0; i < count; i++) {
-        launch(turkeySVG(), 'turkey', i ? 5 : 6.8, duration, i * (2.5 + Math.random() * 2), goingLeft);
+        launch(turkeySVG(), 'turkey', i ? 5.6 : 7.4, duration, i * (2.5 + Math.random() * 2), goingLeft);
+      }
+      // Now and then the lead turkey stops to show off its tail mid-strut
+      if (Math.random() < .35) {
+        const all = $('rink').querySelectorAll('.turkey');
+        const lead = all[all.length - count];
+        if (lead) { const tail = lead.querySelector('.tk-tail'); tail.style.animation = `tk-display ${duration}s ease-in-out ${lead.style.animationDelay}`; }
       }
     }
   }
