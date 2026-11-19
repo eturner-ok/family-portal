@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Home">
+<title>Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=Newsreader:ital,opsz,wght@1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-top: #C6DAE6;
+    --sky-bottom: #EEF3F5;
+    --ink: #142230;
+    --muted: #536676;
+    --faint: rgba(20, 34, 48, .13);
+    --alert: #B3261E;
+    --sans: "Bricolage Grotesque", "Avenir Next", "Helvetica Neue", sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  }
+  body[data-phase="dusk"] { --sky-top: #C9C3D9; --sky-bottom: #EFECF2; }
+  body[data-phase="night"] { --sky-top: #0D1727; --sky-bottom: #1A2638; --ink: #E2E8EF; --muted: #8B9AAD; --faint: rgba(226, 232, 239, .14); }
+
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 75%);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: clamp(13px, 1.55vw, 22px);
+    line-height: 1.3;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    -webkit-user-select: none; user-select: none;
+  }
+  .wrap {
+    box-sizing: border-box;
+    height: 100%;
+    padding: max(2.4vw, env(safe-area-inset-top)) 3.2vw max(2vw, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 2.4vw;
+  }
+
+  /* Top: clock and current weather */
+  .top { display: flex; flex-direction: column; gap: 1em; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 2em; }
+  .clock { font-size: 5.4em; font-weight: 300; letter-spacing: -.035em; line-height: .88; font-variant-numeric: tabular-nums; }
+  .clock small { font-size: .3em; font-weight: 500; letter-spacing: 0; margin-left: .25em; color: var(--muted); }
+  .date { font-size: 1.45em; font-weight: 500; margin-top: .35em; }
+  .now { display: flex; align-items: center; gap: .55em; }
+  .now .icon { font-size: 3.4em; line-height: 1; }
+  .now .temp { font-size: 4.6em; font-weight: 300; line-height: .88; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .now .desc { font-size: 1.15em; font-weight: 600; }
+  .now .sub { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .alert { display: none; background: var(--alert); color: #fff; padding: .55em .9em; border-radius: .45em; font-weight: 600; font-size: 1.1em; }
+  .alert.show { display: block; }
+
+  /* Middle: today + coming up */
+  main { display: grid; grid-template-columns: 1.12fr 1fr; gap: 4vw; min-height: 0; }
+  section { display: flex; flex-direction: column; min-height: 0; }
+  h2 { font-size: 1.55em; font-weight: 650; letter-spacing: -.01em; margin: 0 0 .45em; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .ev { display: grid; grid-template-columns: 5.4em 1fr; gap: .7em; align-items: baseline; padding: .32em 0; }
+  .ev .t { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .88em; white-space: nowrap; }
+  .ev .name { position: relative; padding-left: .7em; }
+  .ev .name::before { content: ""; position: absolute; left: 0; top: .12em; bottom: .12em; width: .24em; border-radius: .2em; background: var(--bar); }
+  .ev .where { display: block; color: var(--muted); font-size: .7em; margin-top: .1em; }
+  .today-list { flex: 1 1 0; min-height: 0; overflow: hidden; -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }
+  .today-list .ev { font-size: 1.4em; padding: .4em 0; }
+  .empty { color: var(--muted); padding: .3em 0; }
+  .today-list .empty { font-size: 1.25em; }
+
+  .verse { border-top: 1px solid var(--faint); padding-top: .9em; margin-top: .6em; }
+  .verse p { margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.3em; line-height: 1.38; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .verse cite { display: block; font-style: normal; font-weight: 600; color: var(--muted); margin-top: .4em; font-size: .9em; }
+
+  .days { flex: 1 1 0; min-height: 0; overflow: hidden; }
+  .day { display: grid; grid-template-columns: 4.2em 1fr; gap: .7em; padding: .38em 0; border-top: 1px solid var(--faint); }
+  .day:first-child { border-top: 0; padding-top: 0; }
+  .day .lab { line-height: 1.25; white-space: nowrap; }
+  .day .lab span { display: inline; color: var(--muted); font-size: .85em; margin-right: .3em; }
+  .day .lab b { font-size: 1.2em; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .day .ev { grid-template-columns: 4.8em 1fr; padding: .12em 0; }
+  .day .empty, .day .more { color: var(--muted); font-size: .9em; padding: .12em 0; }
+
+  /* Bottom: forecast + legend */
+  footer { display: grid; grid-template-columns: 1fr auto; gap: 3vw; align-items: center; border-top: 1px solid var(--faint); padding-top: 1em; }
+  .forecast { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1em; }
+  .fc { display: flex; align-items: center; gap: .5em; }
+  .fc .ic { font-size: 1.9em; line-height: 1; }
+  .fc .dn { font-weight: 600; }
+  .fc .hl { font-variant-numeric: tabular-nums; }
+  .fc .lo, .fc .rain { color: var(--muted); }
+  .fc .rain { font-size: .8em; }
+  .side { display: flex; flex-direction: column; align-items: flex-end; gap: .35em; }
+  .legend { display: flex; gap: 1em; flex-wrap: wrap; justify-content: flex-end; color: var(--muted); font-size: .85em; }
+  .legend i { display: inline-block; width: .62em; height: .62em; border-radius: 50%; background: var(--c); margin-right: .35em; }
+  .status { color: var(--muted); font-size: .75em; }
+  .status.warn { color: var(--alert); font-weight: 600; }
+  body[data-phase="night"] .status.warn { color: #F2A29C; }
+
+  @media (orientation: portrait) {
+    main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .forecast { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <header>
+      <div>
+        <div class="clock" id="clock"></div>
+        <div class="date" id="date"></div>
+      </div>
+      <div class="now" id="now"></div>
+    </header>
+    <div class="alert" id="alert"></div>
+  </div>
+
+  <main>
+    <section>
+      <h2>Today</h2>
+      <ul class="today-list" id="today"></ul>
+      <div class="verse" id="verse"></div>
+    </section>
+    <section>
+      <h2>Coming up</h2>
+      <div class="days" id="days"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="forecast" id="forecast"></div>
+    <div class="side">
+      <div class="legend" id="legend"></div>
+      <div class="status" id="status"></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // ---------- SETTINGS ----------
+  const API_URL = 'PASTE_YOUR_WEB_APP_URL_HERE'; // ends in /exec
+  const TZ = 'America/Chicago';
+  const REFRESH_MINUTES = 10;
+  // ------------------------------
+
+  const $ = id => document.getElementById(id);
+  let data = null, lastOk = 0, lastError = '', shownDay = '';
+
+  function getKey() {
+    const fromLink = new URLSearchParams(location.hash.slice(1)).get('k');
+    if (fromLink) { try { localStorage.setItem('portalKey', fromLink); } catch (e) {} return fromLink; }
+    try { const saved = localStorage.getItem('portalKey'); if (saved) return saved; } catch (e) {}
+    const typed = prompt('Enter the family portal key');
+    if (typed) { try { localStorage.setItem('portalKey', typed); } catch (e) {} }
+    return typed || '';
+  }
+  const KEY = getKey();
+
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const todayIso = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const shortTime = t => String(t).replace(':00 ', ' ');
+
+  function wx(code, isDay) {
+    const c = Number(code);
+    if (c === 0) return [isDay === false ? '🌙' : '☀️', 'Clear'];
+    if (c === 1) return [isDay === false ? '🌙' : '🌤️', 'Mostly clear'];
+    if (c === 2) return ['⛅', 'Partly cloudy'];
+    if (c === 3) return ['☁️', 'Cloudy'];
+    if (c === 45 || c === 48) return ['🌫️', 'Fog'];
+    if (c >= 51 && c <= 55) return ['🌦️', 'Drizzle'];
+    if (c === 56 || c === 57 || c === 66 || c === 67) return ['🧊', 'Freezing rain'];
+    if (c >= 61 && c <= 65) return ['🌧️', 'Rain'];
+    if (c >= 71 && c <= 77) return ['🌨️', 'Snow'];
+    if (c >= 80 && c <= 82) return ['🌧️', 'Showers'];
+    if (c === 85 || c === 86) return ['🌨️', 'Snow showers'];
+    if (c === 95) return ['⛈️', 'Thunderstorms'];
+    if (c === 96 || c === 99) return ['⛈️', 'Storms with hail'];
+    return ['🌡️', ''];
+  }
+
+  function evHTML(e, withWhere) {
+    const n = e.colors.length;
+    const bar = n > 1
+      ? 'linear-gradient(' + e.colors.map((c, i) => `${c} ${i * 100 / n}% ${(i + 1) * 100 / n}%`).join(',') + ')'
+      : e.colors[0];
+    const where = withWhere && e.where ? `<span class="where">${esc(e.where.split(',')[0])}</span>` : '';
+    return `<li class="ev"><span class="t">${esc(shortTime(e.time))}</span><span class="name" style="--bar:${bar}">${esc(e.title)}${where}</span></li>`;
+  }
+
+  function dayHTML(d, max) {
+    const evs = d.events;
+    const shown = evs.length <= max + 1 ? evs : evs.slice(0, max);
+    const more = evs.length - shown.length;
+    const items = evs.length
+      ? shown.map(e => evHTML(e, false)).join('') + (more ? `<li class="more">+${more} more</li>` : '')
+      : '<li class="empty">Nothing scheduled</li>';
+    return `<div class="day"><div class="lab"><span>${esc(d.short)}</span><b>${esc(d.dayNum)}</b></div><ul>${items}</ul></div>`;
+  }
+
+  function tick() {
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit', hour12: true }).formatToParts(now);
+    const g = t => (parts.find(p => p.type === t) || {}).value || '';
+    $('clock').innerHTML = `${g('hour')}:${g('minute')}<small>${g('dayPeriod')}</small>`;
+    $('date').textContent = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'long', month: 'long', day: 'numeric' }).format(now);
+    setTheme(now);
+    if (shownDay && shownDay !== todayIso()) load(); // new day: refresh right away
+    renderStatus();
+  }
+
+  function setTheme(now) {
+    const w = data && data.weather;
+    let phase = 'day';
+    if (w && w.sunrise && w.sunset) {
+      const rise = new Date(w.sunrise).getTime(), set = new Date(w.sunset).getTime(), t = now.getTime(), m = 60000;
+      if (t < rise - 30 * m || t > set + 45 * m) phase = 'night';
+      else if (t < rise + 30 * m || t > set - 30 * m) phase = 'dusk';
+    } else {
+      const h = Number(new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: false }).format(now));
+      if (h < 6 || h >= 20) phase = 'night';
+    }
+    document.body.dataset.phase = phase;
+  }
+
+  function render() {
+    if (!data) return;
+    const w = data.weather;
+
+    if (w) {
+      const [icon, label] = wx(w.now.code, w.now.isDay);
+      const t = w.days[0];
+      $('now').innerHTML = `<div class="icon">${icon}</div><div class="temp">${w.now.temp}°</div>
+        <div><div class="desc">${esc(label)}</div><div class="sub">High ${t.hi}° &nbsp;Low ${t.lo}°</div>
+        <div class="sub">Feels ${w.now.feels}°, wind ${w.now.wind} mph</div></div>`;
+      $('forecast').innerHTML = w.days.slice(1, 6).map(d => {
+        const [ic] = wx(d.code, true);
+        const name = new Date(d.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+        const rain = d.rain != null && d.rain >= 20 ? `<div class="rain">${d.rain}% rain</div>` : '';
+        return `<div class="fc"><div class="ic">${ic}</div><div><div class="dn">${name}</div>
+          <div class="hl">${d.hi}° <span class="lo">${d.lo}°</span></div>${rain}</div></div>`;
+      }).join('');
+    }
+
+    const alerts = data.alerts || [];
+    $('alert').className = 'alert' + (alerts.length ? ' show' : '');
+    $('alert').textContent = alerts.map(a => {
+      const until = a.ends ? ' until ' + new Date(a.ends).toLocaleString('en-US', { timeZone: TZ, weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '';
+      return a.event + until;
+    }).join('   |   ');
+
+    if (data.calendar) {
+      const iso = todayIso();
+      let days = data.calendar.days;
+      const i = days.findIndex(d => d.iso === iso);
+      if (i > 0) days = days.slice(i);
+      shownDay = iso;
+      const today = days[0] && days[0].iso === iso ? days[0] : { events: [] };
+      $('today').innerHTML = today.events.length
+        ? today.events.map(e => evHTML(e, true)).join('')
+        : '<li class="empty">Nothing on the calendar today.</li>';
+
+      const rest = days.slice(1, 8);
+      const box = $('days');
+      for (let max = 3; max >= 1; max--) {
+        box.innerHTML = rest.map(d => dayHTML(d, max)).join('');
+        if (box.scrollHeight <= box.clientHeight + 2) break;
+      }
+    } else if (data.calendarError) {
+      $('today').innerHTML = '<li class="empty">Calendars didn’t load. Run testSetup in Apps Script to see why.</li>';
+    }
+
+    const v = data.verse;
+    $('verse').innerHTML = v ? `<p>${esc(v.text)}</p><cite>${esc(v.ref)} (${esc(v.version)})</cite>` : '';
+
+    $('legend').innerHTML = (data.people || []).map(p => `<span><i style="--c:${p.color}"></i>${esc(p.name)}</span>`).join('');
+    setTheme(new Date());
+  }
+
+  function renderStatus() {
+    const el = $('status');
+    const problems = (data && data.calendar && data.calendar.problems) || [];
+    const stale = lastOk && Date.now() - lastOk > 30 * 60000;
+    if (!lastOk && lastError) { el.className = 'status warn'; el.textContent = 'Can’t reach the portal service: ' + lastError; return; }
+    if (stale) {
+      el.className = 'status warn';
+      el.textContent = 'Last updated ' + new Date(lastOk).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+      return;
+    }
+    el.className = problems.length ? 'status warn' : 'status';
+    el.textContent = problems.join('. ');
+  }
+
+  async function load() {
+    try {
+      const res = await fetch(API_URL + '?key=' + encodeURIComponent(KEY) + '&t=' + Date.now());
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      data = json; lastOk = Date.now(); lastError = '';
+      render();
+    } catch (err) {
+      lastError = err.message || String(err);
+    }
+    renderStatus();
+  }
+
+  tick();
+  load();
+  setInterval(tick, 15000);
+  setInterval(load, REFRESH_MINUTES * 60000);
+</script>
+</body>
+</html>
