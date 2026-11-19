@@ -344,3 +344,276 @@
       const rest = days.slice(1, 8);
       const box = $('days');
       for (let max = 3; max >= 1; max--) {
+        box.innerHTML = rest.map(d => dayHTML(d, max)).join('');
+        if (box.scrollHeight <= box.clientHeight + 2) break;
+      }
+    } else if (data.calendarError) {
+      $('today').innerHTML = '<li class="empty">Calendars didn’t load. Run testSetup in Apps Script to see why.</li>';
+    }
+
+    const v = data.verse;
+    $('verse').innerHTML = v ? `<p>${esc(v.text)}</p><cite>${esc(v.ref)} (${esc(v.version)})</cite>` : '';
+
+    $('legend').innerHTML = (data.people || []).map(p =>
+      `<button type="button" class="${hidden.includes(p.name) ? 'off' : ''}" data-name="${esc(p.name)}"><i style="--c:${p.color}"></i>${esc(p.name)}</button>`).join('');
+    setTheme(new Date());
+  }
+
+  function renderStatus() {
+    const el = $('status');
+    const problems = (data && data.calendar && data.calendar.problems) || [];
+    const stale = lastOk && Date.now() - lastOk > 30 * 60000;
+    if (!lastOk && lastError) { el.className = 'status warn'; el.textContent = 'Can’t reach the portal service: ' + lastError; return; }
+    if (stale) {
+      el.className = 'status warn';
+      el.textContent = 'Last updated ' + new Date(lastOk).toLocaleTimeString('en-US', { timeZone: TZ, hour: 'numeric', minute: '2-digit' });
+      return;
+    }
+    el.className = problems.length ? 'status warn' : 'status';
+    el.textContent = problems.join('. ');
+  }
+
+  async function load() {
+    try {
+      const res = await fetch(API_URL + '?key=' + encodeURIComponent(KEY) + '&t=' + Date.now());
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      data = json; lastOk = Date.now(); lastError = '';
+      render();
+    } catch (err) {
+      lastError = err.message || String(err);
+    }
+    renderStatus();
+  }
+
+  $('legend').addEventListener('click', e => {
+    const b = e.target.closest('button[data-name]');
+    if (b) toggleHidden(b.dataset.name);
+  });
+
+
+  // ---------- Advent wreath ----------
+  // One candle lights each Sunday of Advent; the middle counts down to Christmas.
+  // Shows from the first Sunday of Advent through ADVENT_END. Preview another day with &date=2026-12-14
+  const ADVENT_END = '01-01';
+  const ADVENT_THEMES = ['Hope', 'Peace', 'Joy', 'Love'];   // change the order here if your tradition differs
+  const CANDLES = ['purple', 'purple', 'rose', 'purple'];   // third candle is the rose (joy) candle
+  let adventShown = '';
+
+  function adventToday() {
+    const d = new URLSearchParams(location.hash.slice(1)).get('date');
+    return /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d : todayIso();
+  }
+  const dayNum = iso => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d) / 86400000; };
+  function adventInfo(iso) {
+    const [y, m] = iso.split('-').map(Number);
+    const xYear = m === 1 ? y - 1 : y;                          // in January, look back at last Christmas
+    const xmas = Date.UTC(xYear, 11, 25) / 86400000;
+    const xmasDow = new Date(Date.UTC(xYear, 11, 25)).getUTCDay();
+    const fourthSunday = xmas - (xmasDow === 0 ? 7 : xmasDow);
+    const firstSunday = fourthSunday - 21;
+    const today = dayNum(iso);
+    const [ey, em, ed] = [xYear + 1, ...ADVENT_END.split('-').map(Number)];
+    const end = em === 1 ? Date.UTC(ey, em - 1, ed) / 86400000 : Date.UTC(xYear, em - 1, ed) / 86400000;
+    if (today < firstSunday || today > end) return null;
+    return {
+      week: Math.min(4, Math.floor((today - firstSunday) / 7) + 1),
+      daysLeft: xmas - today
+    };
+  }
+
+  function wreathSVG(info) {
+    const cx = 60, cy = 62, R = 38;
+    let leaves = '';
+    for (let i = 0; i < 36; i++) {
+      const a = i * 10 + (i % 3) * 3;
+      const r = R + ((i % 4) - 1.5) * 2.2;
+      const x = cx + r * Math.cos(a * Math.PI / 180), y = cy + r * Math.sin(a * Math.PI / 180);
+      const tilt = a + 90 + ((i % 5) - 2) * 14;
+      leaves += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="9.5" ry="4" fill="var(--wr-${(i % 3) + 1})" transform="rotate(${tilt} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }
+    let berries = '';
+    for (let i = 0; i < 9; i++) {
+      const a = i * 40 + 20, r = i % 2 ? R + 6 : R - 6;
+      berries += `<circle cx="${(cx + r * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(cy + r * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="2.3" fill="#C8382E"/>`;
+    }
+    const flame = (x, top, delay) => `
+      <circle class="glow" cx="${x}" cy="${top - 5}" r="8" fill="#F6B73C" style="animation-delay:${delay}s"/>
+      <path class="flame" style="animation-delay:${delay}s" d="M${x} ${top - 12} C${x + 4} ${top - 6} ${x + 4} ${top - 1} ${x} ${top} C${x - 4} ${top - 1} ${x - 4} ${top - 6} ${x} ${top - 12} Z" fill="#F6B73C"/>
+      <path d="M${x} ${top - 7} C${x + 2} ${top - 4} ${x + 2} ${top - 1.5} ${x} ${top - 1} C${x - 2} ${top - 1.5} ${x - 2} ${top - 4} ${x} ${top - 7} Z" fill="#FFF1C2"/>`;
+    const spots = [225, 315, 45, 135];
+    let candles = '';
+    spots.forEach((deg, i) => {
+      const x = +(cx + R * Math.cos(deg * Math.PI / 180)).toFixed(1);
+      const base = +(cy + R * Math.sin(deg * Math.PI / 180)).toFixed(1) + 3;
+      const top = base - 24;
+      const lit = info.daysLeft <= 0 || i < info.week;
+      candles += `<rect x="${x - 4.5}" y="${top}" width="9" height="24" rx="1.6" fill="var(--${CANDLES[i]})"/>
+        <path d="M${x} ${top} L${x} ${top - 2.5}" stroke="var(--ink)" stroke-width="1" opacity=".6"/>
+        ${lit ? flame(x, top - 1.5, -i * .45) : ''}`;
+    });
+    let middle;
+    if (info.daysLeft > 0) {
+      middle = `<text class="num" x="${cx}" y="${cy + 6}" text-anchor="middle" font-size="${info.daysLeft > 9 ? 23 : 26}">${info.daysLeft}</text>
+        <text class="unit" x="${cx}" y="${cy + 16}" text-anchor="middle" font-size="7.5">${info.daysLeft === 1 ? 'day' : 'days'}</text>`;
+    } else {
+      middle = `<rect x="${cx - 5}" y="${cy - 8}" width="10" height="26" rx="1.8" fill="#F4EFE6" stroke="rgba(0,0,0,.15)" stroke-width=".6"/>
+        <path d="M${cx} ${cy - 8} L${cx} ${cy - 10.5}" stroke="var(--ink)" stroke-width="1" opacity=".6"/>${flame(cx, cy - 10, -.9)}`;
+    }
+    return `<svg viewBox="0 0 120 120" aria-hidden="true">${leaves}${berries}${candles}${middle}</svg>`;
+  }
+
+  function renderAdvent() {
+    const iso = adventToday();
+    if (iso === adventShown) return;
+    adventShown = iso;
+    const box = $('advent');
+    const info = adventInfo(iso);
+    if (!info) { box.className = 'advent'; box.innerHTML = ''; return; }
+    let cap;
+    if (info.daysLeft > 1) cap = `<b>${ADVENT_THEMES[info.week - 1]}</b>Advent week ${info.week}`;
+    else if (info.daysLeft === 1) cap = '<b>Christmas Eve</b>';
+    else if (info.daysLeft === 0) cap = '<b>Merry Christmas!</b>';
+    else cap = '<b>Christmas</b>season';
+    box.className = 'advent show';
+    box.innerHTML = wreathSVG(info) + `<div class="cap">${cap}</div>`;
+  }
+
+  // ---------- Seasonal themes ----------
+  // Dates are month-day, inclusive. To preview, add &season=thanksgiving or &season=christmas to the link.
+  const SEASONS = {
+    thanksgiving: { start: '11-01', end: '11-30', falling: true },  // falling leaves + strutting turkeys
+    christmas:    { start: '12-01', end: '01-01', falling: true }   // snow + skaters
+  };
+  const SCARVES = ['#C8382E', '#2E7D4F', '#D4A12A', '#2F6FB0', '#B8487A'];
+  const LEAVES = ['#B8452A', '#D98B2B', '#9C3423', '#C9A03A', '#A8612E'];
+  const FEATHERS = ['#8E3A22', '#C9772A', '#6E4528', '#D49A3A', '#A6502A'];
+
+  const previewSeason = (() => {
+    const h = new URLSearchParams(location.hash.slice(1));
+    return h.get('season') || (h.get('xmas') === '1' ? 'christmas' : '');
+  })();
+  const inRange = (md, a, b) => a <= b ? (md >= a && md <= b) : (md >= a || md <= b);
+  function currentSeason() {
+    if (previewSeason && SEASONS[previewSeason]) return previewSeason;
+    const md = todayIso().slice(5);
+    return Object.keys(SEASONS).find(k => inRange(md, SEASONS[k].start, SEASONS[k].end)) || '';
+  }
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  function skaterSVG(scarf, hat) {
+    return `<svg viewBox="0 0 60 84" aria-hidden="true"><g class="bob"><g transform="rotate(9 30 72)">
+      <path class="scarf" fill="${scarf}" d="M38 23 C30 22 20 19 8 23 L9 28 C20 25 29 26 37 28 Z"/>
+      <g fill="currentColor">
+        <circle cx="36" cy="17" r="7"/>
+        <path d="M30 24 L42 24 L36 48 L24 48 Z"/>
+      </g>
+      <path fill="${hat}" d="M28.6 15.5 Q36 2 43.4 15.5 Z"/><circle fill="${hat}" cx="36" cy="5.5" r="2.8"/>
+      <path fill="${scarf}" d="M31 23 L42 23 L41 27 L32 27 Z"/>
+      <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none">
+        <path d="M33 29 L21 37"/><path d="M40 29 L51 34"/>
+      </g>
+      <g class="leg a" stroke="currentColor" stroke-linecap="round" fill="none">
+        <path stroke-width="5.5" d="M30 47 L26 70"/><path stroke-width="2" d="M20 73.5 L33 73.5"/>
+      </g>
+      <g class="leg b" stroke="currentColor" stroke-linecap="round" fill="none">
+        <path stroke-width="5.5" d="M31 47 L35 70"/><path stroke-width="2" d="M29 73.5 L42 73.5"/>
+      </g>
+    </g></g></svg>`;
+  }
+
+  function turkeySVG() {
+    const fan = [-62, -31, 0, 31, 62].map((a, i) =>
+      `<ellipse cx="30" cy="27" rx="7.5" ry="21" fill="${FEATHERS[i]}" transform="rotate(${a} 30 50)"/>`).join('');
+    return `<svg viewBox="0 0 80 80" aria-hidden="true"><g class="bob">
+      ${fan}
+      <g class="tleg a" stroke="#D4A12A" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M40 60 L38 76 M38 76 L44 77"/></g>
+      <g class="tleg b" stroke="#D4A12A" stroke-width="2.6" stroke-linecap="round" fill="none"><path d="M44 60 L45 76 M45 76 L51 77"/></g>
+      <ellipse class="tk-body" cx="41" cy="50" rx="18" ry="14"/>
+      <path class="tk-wing" d="M30 47 C36 41 47 43 50 52 C43 55 35 54 30 47 Z"/>
+      <g class="head">
+        <path class="tk-neck" d="M51 46 C54 40 55 35 56 30" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+        <circle class="tk-head" cx="57" cy="27" r="5.2"/>
+        <path d="M62 26 L68 28 L62 30 Z" fill="#D4A12A"/>
+        <path d="M60.5 29.5 C63 31 63 35 60.5 37 C59 35 59 32 60.5 29.5 Z" fill="#C8382E"/>
+        <circle cx="58.5" cy="25.6" r="1.1" fill="#142230"/>
+      </g>
+    </g></svg>`;
+  }
+
+  function launch(html, cls, width, duration, delay, goingLeft) {
+    const el = document.createElement('div');
+    el.className = 'skater ' + cls + (goingLeft ? ' left' : '');
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = delay + 's';
+    el.style.width = width + 'vw';
+    el.innerHTML = html;
+    el.addEventListener('animationend', e => { if (e.target === el) el.remove(); });
+    $('rink').appendChild(el);
+  }
+
+  function sendWalkers() {
+    const season = currentSeason();
+    const goingLeft = Math.random() < .5;
+    if (season === 'christmas') {
+      const count = Math.random() < .45 ? 1 : (Math.random() < .7 ? 2 : 3);
+      const duration = 15 + Math.random() * 7;
+      let delay = 0;
+      for (let i = 0; i < count; i++) {
+        launch(skaterSVG(pick(SCARVES), pick(SCARVES)), 'ice', 6.2 + Math.random() * 2.2, duration, delay, goingLeft);
+        delay += 1 + Math.random() * 1.6;
+      }
+    } else if (season === 'thanksgiving') {
+      const count = Math.random() < .7 ? 1 : 2;
+      const duration = 24 + Math.random() * 8;
+      for (let i = 0; i < count; i++) {
+        launch(turkeySVG(), 'turkey', i ? 5 : 6.8, duration, i * (2.5 + Math.random() * 2), goingLeft);
+      }
+    }
+  }
+
+  let particleSeason = '';
+  function updateParticles() {
+    const season = currentSeason();
+    if (season === particleSeason) return;
+    document.querySelectorAll('.particle').forEach(p => p.remove());
+    particleSeason = season;
+    if (!season || !SEASONS[season].falling) return;
+    const isSnow = season === 'christmas';
+    const n = isSnow ? 26 : 13;
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement('div');
+      const dur = isSnow ? 16 + Math.random() * 14 : 18 + Math.random() * 12;
+      p.style.left = (Math.random() * 100) + 'vw';
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = (-Math.random() * dur) + 's';
+      if (isSnow) {
+        const size = 3 + Math.random() * 4;
+        p.className = 'particle flake';
+        p.style.width = p.style.height = size + 'px';
+        p.style.opacity = (.35 + Math.random() * .45).toFixed(2);
+      } else {
+        p.className = 'particle leaf';
+        p.style.width = (14 + Math.random() * 10) + 'px';
+        p.style.opacity = (.7 + Math.random() * .25).toFixed(2);
+        p.innerHTML = `<svg viewBox="0 0 20 20" style="animation-duration:${(4 + Math.random() * 5).toFixed(1)}s"><path fill="${pick(LEAVES)}" d="M10 1 C15.5 5 17.5 11 10 18 C2.5 11 4.5 5 10 1 Z"/><path d="M10 4 L10 20" stroke="rgba(0,0,0,.25)" stroke-width="1"/></svg>`;
+      }
+      $('rink').appendChild(p);
+    }
+  }
+
+  function nextWalkers() {
+    const wait = previewSeason ? 20000 : (2 + Math.random() * 5) * 60000; // every 2 to 7 minutes
+    setTimeout(() => { updateParticles(); sendWalkers(); nextWalkers(); }, wait);
+  }
+  updateParticles();
+  setTimeout(sendWalkers, 6000);
+  nextWalkers();
+
+  tick();
+  load();
+  setInterval(tick, 15000);
+  setInterval(load, REFRESH_MINUTES * 60000);
+</script>
+</body>
+</html>
